@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Baldur's Encounter — Countdown &amp; Dice</title>
+</head>
+<body>
+  <div id="loading" class="loading-screen">
+    <div class="loading-rune">᛭</div>
+    <p>Loading the Forgotten Realms…</p>
+  </div>
+
+  <div id="app" class="hidden">
+    <!-- Background runes decoration -->
+    <div class="rune-bg" aria-hidden="true">
+      <span>ᚠ</span><span>ᚢ</span><span>ᚦ</span><span>ᚨ</span>
+      <span>ᚱ</span><span>ᚲ</span><span>ᚷ</span><span>ᚹ</span>
+      <span>ᚺ</span><span>ᚾ</span><span>ᛁ</span><span>ᛃ</span>
+      <span>ᛇ</span><span>ᛈ</span><span>ᛉ</span><span>ᛊ</span>
+    </div>
+
+    <header class="site-header">
+      <div class="header-ornament">✦ ✦ ✦</div>
+      <h1 class="site-title">Baldur's Encounter</h1>
+      <p class="site-subtitle">May Mystra guide your rolls</p>
+      <div class="header-ornament">✦ ✦ ✦</div>
+    </header>
+
+    <main>
+      <!-- Countdown -->
+      <section class="countdown-section card">
+        <div id="countdown-label" class="countdown-label">NEXT SESSION IN:</div>
+        <div id="countdown-display" class="countdown-display">--:--:--</div>
+        <button id="edit-date-btn" class="btn-secondary">⚙ Set Session Date</button>
+
+        <div id="date-editor" class="date-editor hidden">
+          <label for="session-input">Session date &amp; time</label>
+          <input type="datetime-local" id="session-input" />
+          <div class="date-btns">
+            <button id="save-date-btn" class="btn-primary">Save</button>
+            <button id="cancel-date-btn" class="btn-secondary">Cancel</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dice Roller -->
+      <section class="roller-section card">
+        <h2 class="section-title">⚔ Dice Forge ⚔</h2>
+
+        <div class="roller-controls">
+          <label>
+            Count
+            <input type="number" id="dice-count" value="1" min="1" max="20" />
+          </label>
+          <label>
+            Modifier
+            <input type="number" id="dice-modifier" value="0" min="-99" max="99" />
+          </label>
+        </div>
+
+        <div id="dice-grid" class="dice-grid"></div>
+
+        <button id="roll-btn" class="roll-btn">
+          <span class="roll-btn-icon">⚄</span>
+          ROLL <kbd>Space</kbd>
+        </button>
+
+        <div class="result-area">
+          <div id="roll-result" class="roll-result">—</div>
+          <div id="roll-summary" class="roll-summary">Choose a die and roll!</div>
+        </div>
+      </section>
+
+      <!-- History -->
+      <section class="history-section card">
+        <h2 class="section-title">📜 Roll History</h2>
+        <ul id="history-list" class="history-list"></ul>
+      </section>
+    </main>
+
+    <footer>
+      <p>Powered by Rust + WASM &amp; TypeScript ✦ Forgotten Realms await</p>
+    </footer>
+  </div>
+</body>
+</html>

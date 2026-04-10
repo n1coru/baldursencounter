@@ -1,0 +1,5 @@
+dice-wasm/target/
+frontend/node_modules/
+frontend/dist/
+frontend/src/wasm/
+.git/
