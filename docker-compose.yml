@@ -3,4 +3,8 @@ services:
     build: .
     ports:
       - "80:80"
+    volumes:
+      # Mount config without rebuilding the image.
+      # Edit session.config.json, then: docker compose restart
+      - ./session.config.json:/usr/share/nginx/html/session.config.json:ro
     restart: unless-stopped

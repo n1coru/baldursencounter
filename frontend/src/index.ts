@@ -13,23 +13,46 @@ interface RollResult {
 }
 
 // ── Config ──────────────────────────────────────────────────────────────────
-// Change this to your actual session date/time
 const SESSION_KEY = 'bg_session_date';
 
-function getSessionDate(): Date {
+interface SessionConfig {
+  sessionDate: string;  // ISO 8601, e.g. "2026-04-18T19:00:00"
+  sessionName: string;
+}
+
+async function loadConfig(): Promise<SessionConfig | null> {
+  try {
+    const res = await fetch('/session.config.json', { cache: 'no-cache' });
+    if (!res.ok) return null;
+    return await res.json() as SessionConfig;
+  } catch {
+    return null;
+  }
+}
+
+// Priority: localStorage (user override) > session.config.json > fallback
+async function resolveSessionDate(): Promise<{ date: Date; name: string }> {
   const stored = localStorage.getItem(SESSION_KEY);
   if (stored) {
     const d = new Date(stored);
-    if (!isNaN(d.getTime())) return d;
+    if (!isNaN(d.getTime())) return { date: d, name: 'Next Session' };
   }
-  // Default: next Saturday at 19:00 local time
+
+  const cfg = await loadConfig();
+  if (cfg?.sessionDate) {
+    const d = new Date(cfg.sessionDate);
+    if (!isNaN(d.getTime())) {
+      return { date: d, name: cfg.sessionName ?? 'Next Session' };
+    }
+  }
+
+  // Last resort: next Saturday 19:00 local
   const now = new Date();
-  const dayOfWeek = now.getDay(); // 0=Sun,6=Sat
-  const daysUntilSat = (6 - dayOfWeek + 7) % 7 || 7;
+  const daysUntilSat = (6 - now.getDay() + 7) % 7 || 7;
   const next = new Date(now);
   next.setDate(now.getDate() + daysUntilSat);
   next.setHours(19, 0, 0, 0);
-  return next;
+  return { date: next, name: 'Next Session' };
 }
 
 function saveSessionDate(date: Date) {
@@ -37,7 +60,7 @@ function saveSessionDate(date: Date) {
 }
 
 // ── Countdown ────────────────────────────────────────────────────────────────
-let sessionDate = getSessionDate();
+let sessionDate = new Date();
 let countdownInterval: ReturnType<typeof setInterval> | null = null;
 
 function updateCountdown() {
@@ -262,11 +285,20 @@ function setupCountModifier() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
-  try {
-    wasmModule = await import('./wasm/dice_wasm');
-    await (wasmModule as any).default?.();
-  } catch (e) {
-    console.error('WASM load failed:', e);
+  // Load WASM and config in parallel
+  const [, resolved] = await Promise.all([
+    import('./wasm/dice_wasm').then(m => {
+      wasmModule = m;
+      return (m as any).default?.();
+    }).catch(e => console.error('WASM load failed:', e)),
+    resolveSessionDate(),
+  ]);
+
+  sessionDate = resolved.date;
+  // Show session name in the subtitle if provided in config
+  const subtitle = document.querySelector('.site-subtitle');
+  if (subtitle && resolved.name !== 'Next Session') {
+    subtitle.textContent = resolved.name;
   }
 
   setupDiceButtons();

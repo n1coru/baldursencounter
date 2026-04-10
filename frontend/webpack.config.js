@@ -41,6 +41,12 @@ module.exports = {
           from: path.resolve(__dirname, 'src/wasm/*.wasm'),
           to: '[name][ext]',
         },
+        // session.config.json is served as a static file so it can be
+        // volume-mounted in Docker without rebuilding the image
+        {
+          from: path.resolve(__dirname, '../session.config.json'),
+          to: 'session.config.json',
+        },
       ],
     }),
   ],
