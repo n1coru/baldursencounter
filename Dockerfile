@@ -1,5 +1,5 @@
 # ── Stage 1: Build Rust → WASM ─────────────────────────────────────────────
-FROM rust:1.77-slim AS wasm-builder
+FROM rust:1.82-slim AS wasm-builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl pkg-config libssl-dev \
